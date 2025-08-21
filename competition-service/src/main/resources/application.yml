@@ -1,0 +1,76 @@
+server:
+    error:
+        include-message: always
+
+logging:
+    level:
+        root: INFO
+        com.athletics: DEBUG
+        org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+        org.mongodb.driver: DEBUG
+        org.springframework.data.mongodb.embedded: DEBUG
+
+---
+# For test profile
+spring:
+    config:
+        activate:
+            on-profile: test
+
+    data:
+        mongodb:
+            username: user
+            password: pwd
+            host: localhost
+            port: 0
+            database: competitions-db
+            authentication-database: admin
+            auto-index-creation: true
+
+de:
+    flapdoodle:
+        mongodb:
+            embedded:
+                version: 5.0.5
+
+app:
+    team-service:
+        host: localhost
+        port: 7001
+    sponsor-service:
+        host: localhost
+        port: 7002
+    facility-service:
+        host: localhost
+        port: 7003
+
+---
+# For docker profile
+spring:
+    config:
+        activate:
+            on-profile: docker
+
+    data:
+        mongodb:
+            username: user
+            password: pwd
+            host: mongodb
+            port: 27017
+            database: competitions-db
+            authentication-database: admin
+            auto-index-creation: true
+
+server:
+    port: 8080
+
+app:
+    team-service:
+        host: team-service
+        port: 8080
+    sponsor-service:
+        host: sponsor-service
+        port: 8080
+    facility-service:
+        host: facility-service
+        port: 8080

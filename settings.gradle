@@ -1,0 +1,6 @@
+include 'team-service'
+include 'sponsor-service'
+include 'facility-service'
+include 'competition-service'
+include 'api-gateway'
+

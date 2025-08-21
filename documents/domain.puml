@@ -1,0 +1,144 @@
+@startuml
+hide circle
+top to bottom direction
+scale 2.0
+
+!define AGGREGATE_ROOT(name) class name <<Aggregate Root>>
+!define ENTITY(name) class name <<Entity>>
+!define VALUE_OBJECT(name) class name <<Value Object>>
+!define ENUM(name) class name <<Enum>>
+
+!pragma useVerticalIf on
+skinparam dpi 300
+skinparam packageStyle rectangle
+skinparam rectangle {
+    BackgroundColor #f7f4eb
+    BorderColor Black
+}
+
+rectangle "Athletics Domain" as AthleticsDomain #line.dashed {
+
+    package "Team Management Sub-Domain" <<Rectangle>> #lightblue {
+        AGGREGATE_ROOT(Team) #lightblue {
+            + teamName: String
+            + coachName: String
+            + teamLevel: TeamLevelEnum
+        }
+
+        ENTITY(Athlete) #lightpink {
+            + firstName: String
+            + lastName: String
+            + dateOfBirth: Date
+            + athleteCategory: AthleteCategoryEnum
+        }
+
+        VALUE_OBJECT(TeamIdentifier) #Bisque {
+            teamId: UUID
+        }
+
+        VALUE_OBJECT(AthleteIdentifier) #Bisque {
+            athleteId: UUID
+        }
+
+        ENUM(TeamLevelEnum) {
+            HIGH_SCHOOL
+            COLLEGE
+            PROFESSIONAL
+            NATIONAL
+        }
+
+        ENUM(AthleteCategoryEnum) {
+            JUNIOR
+            SENIOR
+            MASTER
+            PARALYMPIC
+        }
+
+        Team --> TeamIdentifier
+        Team --> TeamLevelEnum
+        Team "1" o--> "0..*" Athlete
+        Athlete --> AthleteIdentifier
+        Athlete --> AthleteCategoryEnum
+    }
+
+    package "Sponsor Management Sub-Domain" <<Rectangle>> #LightSalmon {
+        AGGREGATE_ROOT(Sponsor) #lightblue {
+            + sponsorName: String
+            + sponsorLevel: SponsorLevelEnum
+            + sponsorAmount: Decimal
+        }
+
+        VALUE_OBJECT(SponsorIdentifier) #Bisque {
+            sponsorId: UUID
+        }
+
+        ENUM(SponsorLevelEnum) {
+            PLATINUM
+            GOLD
+            SILVER
+            BRONZE
+        }
+
+        Sponsor --> SponsorIdentifier
+        Sponsor --> SponsorLevelEnum
+    }
+
+    package "Facility Management Sub-Domain" <<Rectangle>> #LightGray {
+        AGGREGATE_ROOT(Facility) #lightblue {
+            + facilityName: String
+            + capacity: Integer
+            + location: String
+            + facilityType: FacilityTypeEnum
+        }
+
+        VALUE_OBJECT(FacilityIdentifier) #Bisque {
+            facilityId: UUID
+        }
+
+        ENUM(FacilityTypeEnum) {
+            STADIUM
+            ARENA
+            TRAINING_CENTER
+            MEDICAL_CENTER
+        }
+
+        Facility --> FacilityIdentifier
+        Facility --> FacilityTypeEnum
+    }
+
+    package "Competition Management Sub-Domain (Core)" <<Rectangle>> #Thistle {
+        note "Invariant: When a competition status is set to COMPLETED, the Competition aggregate MUST call SponsorService to upgrade its Sponsor to PLATINUM and then persist its new state in one atomic operation." as competitionInvariant
+
+        AGGREGATE_ROOT(Competition) #lightblue {
+            + competitionName: String
+            + competitionDate: Date
+            + competitionStatus: CompetitionStatusEnum
+            + competitionResult: CompetitionResultEnum
+        }
+
+        VALUE_OBJECT(CompetitionIdentifier) #Bisque {
+            competitionId: UUID
+        }
+
+        ENUM(CompetitionStatusEnum) {
+            SCHEDULED
+            ONGOING
+            COMPLETED
+            CANCELLED
+        }
+
+        ENUM(CompetitionResultEnum) {
+            WIN
+            LOSS
+            DRAW
+        }
+
+        Competition --> CompetitionIdentifier
+        Competition --> CompetitionStatusEnum
+        Competition --> CompetitionResultEnum
+        Competition --> TeamIdentifier
+        Competition --> SponsorIdentifier
+        Competition --> FacilityIdentifier
+    }
+}
+@enduml

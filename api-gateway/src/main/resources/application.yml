@@ -1,0 +1,46 @@
+server:
+    error:
+        include-message: always
+
+logging:
+    level:
+        root: INFO
+        com.athletics.apigateway: DEBUG
+
+app:
+    team-service:
+        host: localhost
+        port: 7001
+    sponsor-service:
+        host: localhost
+        port: 7002
+    facility-service:
+        host: localhost
+        port: 7003
+    competition-service:
+        host: localhost
+        port: 7004
+
+
+---
+spring:
+    config:
+        activate:
+            on-profile: docker
+server:
+    port: 8080
+
+app:
+    team-service:
+        host: team-service
+        port: 8080
+    sponsor-service:
+        host: sponsor-service
+        port: 8080
+    facility-service:
+        host: facility-service
+        port: 8080
+    competition-service:
+        host: competition-service
+        port: 8080
+

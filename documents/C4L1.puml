@@ -1,0 +1,21 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Context.puml
+
+title System Context Diagram for Athletics Management System
+
+Person(coach, "Team Coach", "Oversees team activities, athlete training, and performance")
+Person(athlete, "Athlete", "Participates in competitions and tracks personal performance")
+Person(sponsorRep, "Sponsor Representative", "Handles sponsorship contracts and payments")
+Person(facilityMgr, "Facility Manager", "Maintains facilities and equipment")
+Person(competitionOrg, "Competition Organizer", "Schedules and oversees competitions")
+
+System(athleticsSystem, "Athletics Management System", "A microservices-based platform for managing teams, facilities, sponsors, and competitions")
+
+Rel(coach, athleticsSystem, "Manages team rosters, sets training schedules", "Uses")
+Rel(athlete, athleticsSystem, "Views competition info, updates personal data", "Uses")
+Rel(sponsorRep, athleticsSystem, "Manages sponsorship details and financials", "Uses")
+Rel(facilityMgr, athleticsSystem, "Updates facility and equipment availability", "Uses")
+Rel(competitionOrg, athleticsSystem, "Schedules competitions, oversees results", "Uses")
+
+SHOW_LEGEND()
+@enduml

@@ -1,0 +1,65 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/users.puml
+
+AddElementTag("microService", $shape=EightSidedShape(), $bgColor="CornflowerBlue", $fontColor="white", $legendText="micro service\neight sided")
+AddElementTag("storage", $shape=RoundedBoxShape(), $bgColor="lightSkyBlue", $fontColor="white")
+AddRelTag(aggregate_root, $lineColor="red")
+
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+SHOW_PERSON_OUTLINE()
+HIDE_STEREOTYPE()
+
+title Container Diagram for Athletics Management System - Milestone 1
+
+Person(coach, "Team Coach", "Oversees team activities, athlete training, and performance")
+Person(player, "Athlete", "Participates in competitions and tracks personal performance")
+Person(sponsorRep, "Sponsor Representative", "Handles sponsorship contracts and payments")
+Person(facilityMgr, "Facility Manager", "Maintains facilities and equipment")
+Person(competitionOrg, "Competition Organizer", "Schedules and oversees competitions")
+
+System_Boundary(ams, "Athletics Management System") {
+
+  Container(web_app, "Web Application", "JavaScript, React", "Delivers the static content and the athletics single page application to the user's browser.")
+  Container(spa_app, "Single-Page Application", "JavaScript, React", "Provides the athletics functionality to the user via their browser.")
+
+  Container(apiGateway, "API Gateway", "Java, Spring Boot", "Entry point for the system. Handles routing, HATEOAS, and global exception handling. Exposes JSON/REST HTTPS APIs.", "microService")
+
+  Container(team_service, "Team Service", "Java, Spring Boot", "Manages teams and athletes. Provides JSON/REST HTTPS APIs for team-related data.", "microService")
+  Container(sponsor_service, "Sponsor Service", "Java, Spring Boot", "Manages sponsors, contracts, and payments. Provides JSON/REST HTTPS APIs for sponsor-related data.", "microService")
+  Container(facility_service, "Facility Service", "Java, Spring Boot", "Manages facilities and equipment. Provides JSON/REST HTTPS APIs for facility-related data.", "microService")
+  Container(competition_service, "Competition Service (Aggregator)", "Java, Spring Boot", "Aggregates data from Team, Sponsor, and Facility services. Provides JSON/REST HTTPS APIs for competition-related data.", "microService")
+
+  ContainerDb(team_db, "Team DB", "MySQL", "Stores team and athlete data.", "storage")
+  ContainerDb(sponsor_db, "Sponsor DB", "PostgreSQL", "Stores sponsor and contract data.", "storage")
+  ContainerDb(facility_db, "Facility DB", "MySQL", "Stores facility and equipment data.", "storage")
+  ContainerDb(competition_db, "Competition DB", "MongoDB", "Stores competition-related data.", "storage")
+}
+
+Rel(coach, web_app, "Accesses athletics web portal", "HTTPS")
+Rel(player, web_app, "Views schedules & performance data", "HTTPS")
+Rel(sponsorRep, web_app, "Checks sponsorship details", "HTTPS")
+Rel(facilityMgr, web_app, "Monitors facility status", "HTTPS")
+Rel(competitionOrg, web_app, "Schedules competitions", "HTTPS")
+
+Rel(web_app, spa_app, "Delivers dynamic athletics content", "HTTPS")
+Rel(spa_app, apiGateway, "Interacts with athletics APIs", "HTTPS/REST/JSON")
+
+Rel(apiGateway, competition_service, "Makes API calls for Competition Service", "HTTPS/REST/JSON")
+Rel(apiGateway, team_service, "Makes API calls for Team Service", "HTTPS/REST/JSON")
+Rel(apiGateway, sponsor_service, "Makes API calls for Sponsor Service", "HTTPS/REST/JSON")
+Rel(apiGateway, facility_service, "Makes API calls for Facility Service", "HTTPS/REST/JSON")
+
+Rel(competition_service, team_service, "Aggregates team and athlete data", "HTTPS/REST/JSON", $tags="aggregate_root")
+Rel(competition_service, sponsor_service, "Aggregates sponsor and contract data", "HTTPS/REST/JSON", $tags="aggregate_root")
+Rel(competition_service, facility_service, "Aggregates facility and equipment data", "HTTPS/REST/JSON", $tags="aggregate_root")
+
+Rel(team_service, team_db, "Reads from and writes to", "JDBC")
+Rel(sponsor_service, sponsor_db, "Reads from and writes to", "JDBC")
+Rel(facility_service, facility_db, "Reads from and writes to", "JDBC")
+Rel(competition_service, competition_db, "Reads from and writes to", "JDBC")
+
+@enduml
