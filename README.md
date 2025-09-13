@@ -40,5 +40,10 @@ Prereqs: Docker Desktop (or Engine) and Docker Compose.
 # Start everything (builds images on first run)
 docker-compose up --build -d
 
+
 # See containers
 docker compose ps
+
+# Close containers 
+docker compose down -v
+
